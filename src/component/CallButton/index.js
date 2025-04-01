@@ -3,7 +3,7 @@ import { useMicVAD } from "@ricky0123/vad-react";
 import "./styles.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhoneSlash, faPhone } from '@fortawesome/free-solid-svg-icons';
-
+import { VirtualMC } from "../VirtualMC";
 export const CallButton = () => {
   const [audioList, setAudioList] = useState([]);
   const [isCalling, setIsCalling] = useState(false);
@@ -43,7 +43,9 @@ export const CallButton = () => {
       ) : (
         <div className="call-active">
           <h2 className="title">Call in Progress...</h2>
+          <VirtualMC/>
           <div>{vad.userSpeaking && "User is speaking..."}</div>
+
           {audioList.map((audioURL, index) => (
             <div key={index}>
               <audio controls>
