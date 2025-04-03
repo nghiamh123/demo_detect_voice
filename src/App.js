@@ -1,10 +1,12 @@
-import './App.css';
-import { CallButton } from './component/CallButton';
+import "./App.css";
+import ReactSpeechKit from "./component/ReactSpeechKit";
 function App() {
   return (
     <div className="App">
-     <CallButton/>
-      </div>
+      {/* <CallButton/> */}
+      {/* <SpeechToTextComponent /> */}
+      <ReactSpeechKit />
+    </div>
   );
 }
 

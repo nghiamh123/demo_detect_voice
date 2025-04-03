@@ -7,13 +7,19 @@ import { VirtualMC } from "../VirtualMC";
 export const CallButton = () => {
   const [audioList, setAudioList] = useState([]);
   const [isCalling, setIsCalling] = useState(false);
-
+  const [transcripts, setTranscripts] = useState([]);
   const vad = useMicVAD({
-    onSpeechEnd: (audio) => {
+    onSpeechEnd: async (audio) => {
       console.log("User stopped talking");
       const wavBlob = convertFloat32ToWav(audio, 16000);
       const audioURL = URL.createObjectURL(wavBlob);
       setAudioList((prev) => [...prev, audioURL]);
+
+    //   const text = await transcribeAudio(wavBlob);
+    //   console.log("🚀 ~ onSpeechEnd: ~ text:", text)
+    //   if (text) {
+    //     setTranscripts((prev) => [...prev, text]);
+    //   }
     },
   });
 
@@ -51,6 +57,7 @@ export const CallButton = () => {
               <audio controls>
                 <source src={audioURL} type="audio/wav" />
               </audio>
+              <p className="transcript">{transcripts[index] || "Đang xử lý..."}</p>
             </div>
           ))}
           <button className="btn btn-red" onClick={() => setIsCalling(false)}>
@@ -101,3 +108,32 @@ function writeString(view, offset, string) {
     view.setUint8(offset + i, string.charCodeAt(i));
   }
 }
+
+
+async function transcribeAudio(blob) {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      console.error("Speech Recognition API is not supported");
+      return "Speech-to-Text không khả dụng trên trình duyệt này.";
+    }
+  
+    return new Promise((resolve) => {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+  
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        resolve(text);
+      };
+  
+      recognition.onerror = () => {
+        resolve("Lỗi nhận diện giọng nói.");
+      };
+  
+      // Chuyển đổi blob thành URL để nhận diện giọng nói
+      const audioURL = URL.createObjectURL(blob);
+      const audio = new Audio(audioURL);
+      audio.onended = () => recognition.stop();
+      audio.play();
+      recognition.start();
+    });
+  }
